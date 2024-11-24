@@ -7,9 +7,9 @@ load_dotenv()
 from langchain_community.document_loaders import TextLoader
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_chroma import Chroma as chroma
-from langchain_community.vectorstores import FAISS
-# from PROMPTS import ANSWER_QUESTION_PROMPT
+from langchain_chroma import Chroma as chroma # CHROMA ISN"T WORKING!
+from langchain_community.vectorstores import FAISS # THIS IS WORKING!
+from PROMPTS import ANSWER_QUESTION_PROMPT
 from langchain.prompts import PromptTemplate
 
 
@@ -48,22 +48,9 @@ print(" --- SIMILAR CONTENT --- ")
 # print(similar_content[0].page_content)
 print(type(similar_content[0].page_content))
 
-ANSWER_QUESTION_PROMPT = """
-You are an assistant lawyer helping clients by answering
-questions about legal matters.
-Use the following pieces of retrieved context to answer
-the question. If you don't know the answer, say that you
-don't know. DON'T MAKE UP ANYTHING.
-
-{context}
-
----
-
-Answer the question based on the above context: {question}
-"""
-
 # Generate response from similar content
-prompt_template = PromptTemplate(input_variables=["context", "question"], template=ANSWER_QUESTION_PROMPT)
+prompt_template = PromptTemplate(input_variables=["context", "question"], 
+                                 template=ANSWER_QUESTION_PROMPT)
 prompt = prompt_template.format(context=similar_content[0].page_content, 
                                 question=query)
 
