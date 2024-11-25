@@ -7,6 +7,8 @@ from langchain_chroma import Chroma
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
+from langchain_core.documents import Document
 
 import os
 import tempfile
@@ -63,6 +65,14 @@ def get_pdf_text(uploaded_file):
     # finally:
     #     # Ensure the temporary file is deleted when we're done with it
     #     os.unlink(temp_file.name)
+    
+def get_markdown_text(uploaded_file):
+    """
+    Load a markdown document from an uploaded file and return it as a list of documents.
+    """
+    loader = UnstructuredMarkdownLoader(uploaded_file)
+    documents = loader.load()
+    return documents
 
 
 def split_document(documents, chunk_size, chunk_overlap):    
