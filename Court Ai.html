@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Litigation Dashboard - Court AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 20%;
+            background: linear-gradient(135deg, #001f3f, #002d5c);
+            color: #ffffff;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar h2 {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #d4af37;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar ul li {
+            font-size: 18px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease-in-out;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 15px 20px;
+            background-color: transparent;
+            text-align: center;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar ul li::before {
+            content: '\2696'; /* Scales of Justice Unicode */
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .sidebar ul li:hover,
+        .sidebar ul li.active {
+            background: #d4af37;
+            color: #001f3f;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Content Styles */
+        .content {
+            flex: 1;
+            padding: 40px;
+            background: linear-gradient(135deg, #f4f4f9, #e8ebf1);
+            overflow-y: auto;
+        }
+
+        .content h2 {
+            font-size: 34px;
+            color: #001f3f;
+            margin-bottom: 25px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Form Styles */
+        form {
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            border: 2px solid #d4af37;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #001f3f;
+        }
+
+        .form-group textarea,
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 20px;
+            border: 1.5px solid #ccc;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #f9fafc;
+        }
+
+        .form-group textarea:focus,
+        .form-group input[type="text"]:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+            outline: none;
+        }
+
+        .form-group input[type="file"] {
+            display: none;
+        }
+
+        .form-group .custom-file-upload {
+            display: inline-block;
+            width: 100%;
+            padding: 20px;
+            border: 1.5px dashed #ccc;
+            border-radius: 15px;
+            background-color: #f8f9fb;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            color: #001f3f;
+            transition: border-color 0.3s, background-color 0.3s, transform 0.2s;
+        }
+
+        .form-group .custom-file-upload:hover {
+            border-color: #d4af37;
+            background-color: #f0f1f4;
+            color: #001f3f;
+            transform: scale(1.02);
+        }
+
+        .form-group button {
+            background-color: #001f3f;
+            color: #d4af37;
+            font-size: 20px;
+            font-weight: 900;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+
+        .form-group button:hover {
+            background-color: #002d5c;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Court AI</h2>
+            <ul>
+                <li onclick="showTab('client-info')" class="active" id="client-info-tab">Client Information</li>
+                <li onclick="showTab('case-summary')" id="case-summary-tab">Case Summary</li>
+                <li onclick="showTab('case-report')" id="case-report-tab">Case Report</li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Client Information Content -->
+            <div class="content-panel" id="client-info" style="display: block;">
+                <h2><b>Client Information</b></h2>
+                <form>
+                    <div class="form-group">
+                        <label for="legalName">Full Legal Name and Registration:</label>
+                        <input type="text" id="legalName" name="legalName"
+                            placeholder="Enter your company's full legal name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registrationDetails">Registration Details:</label>
+                        <textarea id="registrationDetails" name="registrationDetails" rows="3"
+                            placeholder="Provide the registration details (e.g., company registration number)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keyContacts">Primary Contacts:</label>
+                        <textarea id="keyContacts" name="keyContacts" rows="4"
+                            placeholder="List key personnel involved in this transaction (names, titles, contact information)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="legalCounsel">Legal Representation:</label>
+                        <textarea id="legalCounsel" name="legalCounsel" rows="3"
+                            placeholder="Have you engaged legal counsel? Provide their contact information."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit">Save Client Information</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Case Summary Content -->
+            <div class="content-panel" id="case-summary" style="display: none;">
+                <h2><b>Case Summary</b></h2>
+                <form>
+                    <div class="form-group">
+                        <label for="caseDetails">Case Details:</label>
+                        <textarea id="caseDetails" name="caseDetails" rows="8"
+                            placeholder="Please explain your case in detail..."></textarea>
+                    </div>
+
+                    <h2>Upload Supporting Documents:</h2>
+
+                    <div class="form-group">
+                        <label for="upload1">1 - Contract:</label>
+                        <label class="custom-file-upload">
+                            <input type="file" id="upload1" name="contract">
+                            Click to upload Contract
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="upload2">2 - Proforma Invoice:</label>
+                        <label class="custom-file-upload">
+                            <input type="file" id="upload2" name="proformaInvoice">
+                            Click to upload Proforma Invoice
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="upload3">3 - Payment Receipt:</label>
+                        <label class="custom-file-upload">
+                            <input type="file" id="upload3" name="paymentReceipt">
+                            Click to upload Payment Receipt
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="upload4">4 - Shipping Documents:</label>
+                        <label class="custom-file-upload">
+                            <input type="file" id="upload4" name="shippingDocuments">
+                            Click to upload Shipping Documents
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit">Submit Case</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Case Report Content -->
+            <div class="content-panel" id="case-report" style="display: none;">
+                <h2><b>Case Report</b></h2>
+                <div style="border: 2px solid #d4af37; border-radius: 15px; padding: 20px; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    <p style="font-size: 18px; color: #001f3f; line-height: 1.6;">
+                        This is the Case Report section. You can provide detailed summaries, analyses, or outcomes of the case here.
+                        Ensure all important aspects are covered concisely and clearly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all content panels
+            const contentPanels = document.querySelectorAll('.content-panel');
+            contentPanels.forEach(panel => panel.style.display = 'none');
+
+            // Show the selected content panel
+            const activePanel = document.getElementById(tabId);
+            activePanel.style.display = 'block';
+
+            // Remove 'active' class from all tabs
+            const tabs = document.querySelectorAll('.sidebar ul li');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Add 'active' class to the selected tab
+            const activeTab = document.getElementById(`${tabId}-tab`);
+            activeTab.classList.add('active');
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"8e8d4d3269ecab39","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2024.10.5","token":"7b938305507f4ff9bde0e5828e8b1e42"}' crossorigin="anonymous"></script>
+</body>
+
+</html>
