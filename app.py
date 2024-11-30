@@ -1,26 +1,32 @@
-from app import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, request, jsonify
 import os
+from flask_cors import CORS
+
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS to allow requests from your React frontend
-
-UPLOAD_FOLDER = './uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure the upload folder exists
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+CORS(app, origins=["http://localhost:3000"])
+ 
 @app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+def upload_files():
+    try:
+        # Extract the content from the request body
+        contract_content = request.json.get('contractContent')
+        proforma_invoice_content = request.json.get('proformaInvoiceContent')
+        payment_receipt_content = request.json.get('paymentReceiptContent')
+        shipping_documents_content = request.json.get('shippingDocumentsContent')
 
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No file selected"}), 400
+        print(contract_content)
 
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(file_path)
-    return jsonify({"message": "File uploaded successfully", "file_path": file_path}), 200
+        # Process the data as needed
+        # For now, we just return the data received
+        return jsonify({
+            'contractContent': contract_content,
+            'proformaInvoiceContent': proforma_invoice_content,
+            'paymentReceiptContent': payment_receipt_content,
+            'shippingDocumentsContent': shipping_documents_content
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
