@@ -11,4 +11,6 @@ markdown
 faiss-cpu
 chromadb
 tiktoken
+Flask==2.3.2
+flask-cors==3.0.10
 pinecone-client # 5.0.1
