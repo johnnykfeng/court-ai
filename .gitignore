@@ -1,3 +1,7 @@
 .env
 __pycache__/
 *.pyc
+DOCS/2470-901-01C_Oct_2023_Ref-401-630.pdf
+DOCS/2470-900-01C_Oct2024_User.pdf
+audio_module.py
+IGNORE/
