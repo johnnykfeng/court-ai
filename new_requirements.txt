@@ -1,0 +1,14 @@
+openai
+langchain
+langchain-community
+langchain-openai
+langchain-chroma
+langchain-text-splitters
+python-dotenv
+pandas
+unstructured # for unstructured markdown loader
+markdown
+faiss-cpu
+chromadb
+tiktoken
+
