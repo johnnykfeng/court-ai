@@ -94,16 +94,22 @@ You are a legal assistant who's trying to help a client file a lawsuit against a
 
 METAPROMPT = """You are a legal assistant that is able to answer questions about the given text. A client wants to file a lawsuit against a company. Please help the client understand the process and the possible outcomes. He/she will provide you with the relevant documents and information. Write a detailed report of the process and the possible outcomes, include the chances of winning the lawsuit.
 
+# Case Details:
 {case_details}
 
+# Relevant Legal Information:
 {relevant_legal_information}
 
+# Client Documents 1:
 {client_document_1}
 
+# Client Documents 2:
 {client_document_2}
 
+# Client Documents 3:
 {client_document_3}
 
+# Client Documents 4:
 {client_document_4}
 """
 
