@@ -72,14 +72,14 @@ def upload_files(): # this triggered with SUBMIT CASE button
         shipping_documents_content = request.json.get('shippingDocumentsContent')
 
         # llm processing here
-        search_query = create_search_query(case_details)
-        relevant_legal_information = search_legal_information(search_query)
-        case_report = create_case_report(case_details, 
-                                         relevant_legal_information, 
-                                         contract_content, 
-                                         proforma_invoice_content, 
-                                         payment_receipt_content, 
-                                         shipping_documents_content)
+        # search_query = create_search_query(case_details)
+        # relevant_legal_information = search_legal_information(search_query)
+        # case_report = create_case_report(case_details, 
+        #                                  relevant_legal_information, 
+        #                                  contract_content, 
+        #                                  proforma_invoice_content, 
+        #                                  payment_receipt_content, 
+        #                                  shipping_documents_content)
         
 
         # Process the data as needed

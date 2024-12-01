@@ -1,18 +1,18 @@
+// export default App;
 import React, { useState } from "react";
-import './App.css'; // Assuming the CSS is placed in App.css
 import axios from "axios";
 import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
+import { GlobalWorkerOptions } from 'pdfjs-dist';
+import './App.css'; // Assuming the CSS is placed in App.css
+import Alert from '@mui/material/Alert';
 
 
 function App() {
-  const [file, setFile] = useState(null);
   const [activeTab, setActiveTab] = useState('client-info');
   const [message, setMessage] = useState();
-
-  const showTab = (tabId) => {
-    setActiveTab(tabId);
-  };
+  const [submittedText, setSubmittedText] = useState(""); // State to store submitted text
+  const [caseDetails, setCaseDetails] = useState(''); // State to hold the textarea value
   const [files, setFiles] = useState({
     contract: null,
     proformaInvoice: null,
@@ -20,20 +20,33 @@ function App() {
     shippingDocuments: null
   });
 
+// Set the workerSrc to the correct version of the worker
+GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;
+
   const [fileContents, setFileContents] = useState({
     contractContent: '',
     proformaInvoiceContent: '',
     paymentReceiptContent: '',
     shippingDocumentsContent: ''
   });
+  const [filenames, setFilenames] = useState({
+    contract: '',
+    proformaInvoice: '',
+    paymentReceipt: '',
+    shippingDocuments: ''
+  });
 
-  // Handle file changes for each file input
+  const showTab = (tabId) => {
+    setActiveTab(tabId);
+  };
+
   const handleFileChange = (event, fileType) => {
     const selectedFile = event.target.files[0];
     setFiles((prev) => ({ ...prev, [fileType]: selectedFile }));
+    setFilenames((prev) => ({ ...prev, [fileType]: selectedFile.name }));
 
     const reader = new FileReader();
-    
+
     if (selectedFile.type === "text/plain") {
       // Handle text files
       reader.onload = () => {
@@ -81,57 +94,58 @@ function App() {
     }
   };
 
-  // Handle submit
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  if (!files.contract || !files.proformaInvoice || !files.paymentReceipt || !files.shippingDocuments) {
-    setMessage("Please upload all required files.");
-    return;
-  }
-
-  // Prepare the form data for upload
-  const formData = new FormData();
-  formData.append("contract", files.contract);
-  formData.append("proformaInvoice", files.proformaInvoice);
-  formData.append("paymentReceipt", files.paymentReceipt);
-  formData.append("shippingDocuments", files.shippingDocuments);
-
-  // Prepare the text contents to send in the API call
-  const extractedTexts = {
-    contractContent: fileContents.contractContent,
-    proformaInvoiceContent: fileContents.proformaInvoiceContent,
-    paymentReceiptContent: fileContents.paymentReceiptContent,
-    shippingDocumentsContent: fileContents.shippingDocumentsContent
-  };
-
-  try {
-    // Send the API call with the extracted texts as parameters
-    const response = await axios.post('http://127.0.0.1:5000/upload', {
-      contractContent: extractedTexts.contractContent,
-      proformaInvoiceContent: extractedTexts.proformaInvoiceContent,
-      paymentReceiptContent: extractedTexts.paymentReceiptContent,
-      shippingDocumentsContent: extractedTexts.shippingDocumentsContent
-    });
-
-    // Handle the response
-    if (response.status === 200) {
-      setMessage("Files uploaded and data processed successfully.");
-    } else {
-      setMessage("Failed to process files.");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!files.contract || !files.proformaInvoice || !files.paymentReceipt || !files.shippingDocuments) {
+      setMessage("Please upload all required files.");
+       return;
     }
-  } catch (error) {
-    setMessage("Error uploading files: " + error.message);
-  }
-};
 
-
-    // Prepare the form data for upload
+     // Prepare the form data for upload
     const formData = new FormData();
     formData.append("contract", files.contract);
     formData.append("proformaInvoice", files.proformaInvoice);
     formData.append("paymentReceipt", files.paymentReceipt);
     formData.append("shippingDocuments", files.shippingDocuments);
-  
+    formData.append("caseDetails", caseDetails)
+
+    // Prepare the text contents to send in the API call
+    const extractedTexts = {
+      contractContent: fileContents.contractContent,
+      proformaInvoiceContent: fileContents.proformaInvoiceContent,
+      paymentReceiptContent: fileContents.paymentReceiptContent,
+      shippingDocumentsContent: fileContents.shippingDocumentsContent,
+      caseDetails: caseDetails
+    };
+
+    try {
+      // Send the API call with the extracted texts as parameters
+      const response = await axios.post('http://127.0.0.1:5000/upload', {
+        contractContent: extractedTexts.contractContent,
+        proformaInvoiceContent: extractedTexts.proformaInvoiceContent,
+        paymentReceiptContent: extractedTexts.paymentReceiptContent,
+        shippingDocumentsContent: extractedTexts.shippingDocumentsContent,
+        caseDetails: caseDetails
+
+      });
+
+      if (response.status === 200) {
+        setMessage("Files uploaded and data processed successfully.");
+        setActiveTab('case-report');
+        setSubmittedText(response.data.caseDetails);
+
+       } else {
+        setMessage("Failed to process files.");
+       }
+    } catch (error) {
+      setMessage("Error uploading files: " + error.message);
+    }
+  };
+
+  const handleText = (event) => {
+    setCaseDetails(event.target.value); // Update state with the textarea value
+  };
+
   return (
     <div className="container">
       {/* Sidebar */}
@@ -195,118 +209,153 @@ const handleSubmit = async (event) => {
 
         {/* Case Summary Content */}
         {activeTab === 'case-summary' && (
-          <div className="content-panel">
+          <div className="content-panel" id="case-summary">
+            <h2><b>Case Summary</b></h2>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="caseDetails">Case Details:</label>
+                <textarea id="caseDetails" name="caseDetails" rows="8" 
+                        value={caseDetails} // Bind state to textarea value
+                        onChange={handleText} // Update state on text change                
+                placeholder="Please explain your case in detail..."></textarea>
+                <h2>Upload Supporting Documents</h2>
+                {/* Contract File */}
+                <div className="form-group">
+                  <label htmlFor="upload1">1 - Contract:</label>
+                  <label className="custom-file-upload">
+                    <input
+                      type="file"
+                      id="upload1"
+                      name="contract"
+                      onChange={(e) => handleFileChange(e, 'contract')}
+                    />
+                    Click to upload Contract
+                  </label>
+                  {filenames.contract && (
+                    <div className="file-uploaded">
+                      <p>Uploaded: {filenames.contract}</p>
+                    </div>
+                  )}
+                </div>
 
-        <h2>Upload Supporting Documents</h2>
-           <form onSubmit={handleSubmit}>
-             {/* Contract File */}
-             <div className="form-group">
-               <label htmlFor="upload1">1 - Contract:</label>
-               <label className="custom-file-upload">
-                 <input
-                   type="file"
-                   id="upload1"
-                   name="contract"
-                   onChange={(e) => handleFileChange(e, 'contract')}
-                 />
-                 Click to upload Contract
-               </label>
-               {fileContents.contractContent && (
-                 <div className="file-preview">
-                   <h3>Extracted Content:</h3>
-                   <textarea rows="8" value={fileContents.contractContent} readOnly />
-                 </div>
-               )}
-             </div>
-     
-             {/* Proforma Invoice File */}
-             <div className="form-group">
-               <label htmlFor="upload2">2 - Proforma Invoice:</label>
-               <label className="custom-file-upload">
-                 <input
-                   type="file"
-                   id="upload2"
-                   name="proformaInvoice"
-                   onChange={(e) => handleFileChange(e, 'proformaInvoice')}
-                 />
-                 Click to upload Proforma Invoice
-               </label>
-               {fileContents.proformaInvoiceContent && (
-                 <div className="file-preview">
-                   <h3>Extracted Content:</h3>
-                   <textarea rows="8" value={fileContents.proformaInvoiceContent} readOnly />
-                 </div>
-               )}
-             </div>
-     
-             {/* Payment Receipt File */}
-             <div className="form-group">
-               <label htmlFor="upload3">3 - Payment Receipt:</label>
-               <label className="custom-file-upload">
-                 <input
-                   type="file"
-                   id="upload3"
-                   name="paymentReceipt"
-                   onChange={(e) => handleFileChange(e, 'paymentReceipt')}
-                 />
-                 Click to upload Payment Receipt
-               </label>
-               {fileContents.paymentReceiptContent && (
-                 <div className="file-preview">
-                   <h3>Extracted Content:</h3>
-                   <textarea rows="8" value={fileContents.paymentReceiptContent} readOnly />
-                 </div>
-               )}
-             </div>
-     
-             {/* Shipping Documents File */}
-             <div className="form-group">
-               <label htmlFor="upload4">4 - Shipping Documents:</label>
-               <label className="custom-file-upload">
-                 <input
-                   type="file"
-                   id="upload4"
-                   name="shippingDocuments"
-                   onChange={(e) => handleFileChange(e, 'shippingDocuments')}
-                 />
-                 Click to upload Shipping Documents
-               </label>
-               {fileContents.shippingDocumentsContent && (
-                 <div className="file-preview">
-                   <h3>Extracted Content:</h3>
-                   <textarea rows="8" value={fileContents.shippingDocumentsContent} readOnly />
-                 </div>
-               )}
-             </div>
-     
-             {/* Submit Button */}
-             <div className="form-group">
-               <button type="submit">Submit Case</button>
-             </div>
-     
-             {/* Displaying message */}
-             {message && <p>{message}</p>}
-           </form>
-         </div>
-    
+                {/* Proforma Invoice File */}
+                <div className="form-group">
+                  <label htmlFor="upload2">2 - Proforma Invoice:</label>
+                  <label className="custom-file-upload">
+                    <input
+                      type="file"
+                      id="upload2"
+                      name="proformaInvoice"
+                      onChange={(e) => handleFileChange(e, 'proformaInvoice')}
+                    />
+                    Click to upload Proforma Invoice
+                  </label>
+                  {filenames.proformaInvoice && (
+                    <div className="file-uploaded">
+                      <p>Uploaded: {filenames.proformaInvoice}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Payment Receipt File */}
+                <div className="form-group">
+                  <label htmlFor="upload3">3 - Payment Receipt:</label>
+                  <label className="custom-file-upload">
+                    <input
+                      type="file"
+                      id="upload3"
+                      name="paymentReceipt"
+                      onChange={(e) => handleFileChange(e, 'paymentReceipt')}
+                    />
+                    Click to upload Payment Receipt
+                  </label>
+                  {filenames.paymentReceipt && (
+                    <div className="file-uploaded">
+                      <p>Uploaded: {filenames.paymentReceipt}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Shipping Documents File */}
+                <div className="form-group">
+                  <label htmlFor="upload4">4 - Shipping Documents:</label>
+                  <label className="custom-file-upload">
+                    <input
+                      type="file"
+                      id="upload4"
+                      name="shippingDocuments"
+                      onChange={(e) => handleFileChange(e, 'shippingDocuments')}
+                    />
+                    Click to upload Shipping Documents
+                  </label>
+                  {filenames.shippingDocuments && (
+                    <div className="file-uploaded">
+                      <p>Uploaded: {filenames.shippingDocuments}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <button type="submit">Submit</button>
+                </div>
+              </div>
+              {message &&<Alert
+          severity="info"
+          sx={{
+            width: '100%', // Adjust width inside the container
+            height: '10vh', // Height using viewport units
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        
+        >
+          {message}
+        </Alert>}
+            </form>
+           
+            
+          </div>
         )}
 
         {/* Case Report Content */}
         {activeTab === 'case-report' && (
-          <div className="content-panel">
+            <div className="content-panel">
             <h2><b>Case Report</b></h2>
             <div style={{ border: '2px solid #d4af37', borderRadius: '15px', padding: '20px', backgroundColor: '#ffffff', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}>
               <p style={{ fontSize: '18px', color: '#001f3f', lineHeight: '1.6' }}>
                 This is the Case Report section. You can provide detailed summaries, analyses, or outcomes of the case here.
                 Ensure all important aspects are covered concisely and clearly.
               </p>
+
+              <div
+        style={{
+          marginTop: "20px",
+          border: "2px solid #d4af37",
+          borderRadius: "15px",
+          padding: "20px",
+          backgroundColor: "#ffffff",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        {submittedText ? (
+          <p style={{ fontSize: "18px", color: "#001f3f", lineHeight: "1.6" }}>
+            {submittedText}
+          </p>
+        ) : (
+          <p style={{ fontSize: "18px", color: "#888888", lineHeight: "1.6" }}>
+            no result 
+          </p>
+        )}
+      </div>
+
             </div>
           </div>
         )}
       </div>
+ 
     </div>
   );
-  }
-
+}
 
 export default App;
