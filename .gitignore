@@ -8,3 +8,6 @@ IGNORE/
 # Virtual Environment
 .venv/
 venv/
+uploads/
+node_modules/
+
