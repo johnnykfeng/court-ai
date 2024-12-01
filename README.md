@@ -16,6 +16,26 @@ Court AI is designed to provide users with accessible and understandable legal a
 
 ![alt text](ASSETS/architecture.png)
 
+## How to use
+
+**Run the frontend locally**
+
+`cd FRONTEND`,   go to FRONTEND directory
+
+`npm install`,   install the relevant packages
+
+`npm start`,   start the react app
+
+**Connect to python backend via Flask API**
+
+`pip install -r requirements.txt`, install necessary python packages
+
+`python app.py`, run the flask app
+
+## Demo Video
+
+Check out our demo video: [https://youtu.be/vO6WTkogQYQ](https://youtu.be/vO6WTkogQYQ)
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
