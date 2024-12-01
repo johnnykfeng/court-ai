@@ -420,11 +420,14 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
           }}
         >
           {submittedText ? (
-            <ReactMarkdown
+            <div style={{lineHeight: 2.0}}>
+              <ReactMarkdown
               children={submittedText}
               remarkPlugins={[remarkGfm]}
               style={{ fontSize: "18px", color: "#001f3f", lineHeight: "1.6" }}
             />
+              </div>
+            
           ) : (
             <p
               style={{
