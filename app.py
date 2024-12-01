@@ -6,7 +6,6 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.prompts import PromptTemplate
 from PROMPTS import *
 from pinecone_module import get_similar_content
-from IGNORE.sample_docs import *
 import os
 from dotenv import load_dotenv
 load_dotenv()   

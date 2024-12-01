@@ -6,11 +6,16 @@ import mammoth from 'mammoth';
 import { GlobalWorkerOptions } from 'pdfjs-dist';
 import './App.css'; // Assuming the CSS is placed in App.css
 import Alert from '@mui/material/Alert';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 
 function App() {
   const [activeTab, setActiveTab] = useState('client-info');
   const [message, setMessage] = useState();
+  const [loading, setLoading] = useState(false);
   const [submittedText, setSubmittedText] = useState(""); // State to store submitted text
   const [caseDetails, setCaseDetails] = useState(''); // State to hold the textarea value
   const [files, setFiles] = useState({
@@ -39,6 +44,7 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
   const showTab = (tabId) => {
     setActiveTab(tabId);
   };
+
 
   const handleFileChange = (event, fileType) => {
     const selectedFile = event.target.files[0];
@@ -101,6 +107,8 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
        return;
     }
 
+     setLoading(!loading);
+
      // Prepare the form data for upload
     const formData = new FormData();
     formData.append("contract", files.contract);
@@ -132,8 +140,9 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
       if (response.status === 200) {
         setMessage("Files uploaded and data processed successfully.");
         setActiveTab('case-report');
-        setSubmittedText(response.data.caseDetails);
-
+        console.log("The output:", response.data.caseReport)
+        setSubmittedText(response.data.caseReport);
+        setLoading(false);
        } else {
         setMessage("Failed to process files.");
        }
@@ -218,7 +227,7 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
                         value={caseDetails} // Bind state to textarea value
                         onChange={handleText} // Update state on text change                
                 placeholder="Please explain your case in detail..."></textarea>
-                <h2>Upload Supporting Documents</h2>
+                <h2 style={{marginTop: 30}}>Upload Supporting Documents</h2>
                 {/* Contract File */}
                 <div className="form-group">
                   <label htmlFor="upload1">1 - Contract:</label>
@@ -296,7 +305,24 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
                 </div>
 
                 <div className="form-group">
-                  <button type="submit">Submit</button>
+                <button
+  type="submit"
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "15px", // Space between spinner and text
+    padding: "23px 50px",
+    fontSize: "16px",
+    position: "relative",
+  }}
+>
+  {loading && <CircularProgress color="secondary" size={20} />}
+  <span>Submit</span>
+</button>
+                {/* <button type="submit">
+                {loading && <CircularProgress color="secondary" />}
+                  Submit</button> */}
                 </div>
               </div>
               {message &&<Alert
@@ -320,17 +346,43 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
 
         {/* Case Report Content */}
         {activeTab === 'case-report' && (
-            <div className="content-panel">
-            <h2><b>Case Report</b></h2>
-            <div style={{ border: '2px solid #d4af37', borderRadius: '15px', padding: '20px', backgroundColor: '#ffffff', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}>
-              <p style={{ fontSize: '18px', color: '#001f3f', lineHeight: '1.6' }}>
-                This is the Case Report section. You can provide detailed summaries, analyses, or outcomes of the case here.
-                Ensure all important aspects are covered concisely and clearly.
-              </p>
+      //       <div className="content-panel">
+      //       <h2><b>Case Report</b></h2>
+      //       <div style={{ border: '2px solid #d4af37', borderRadius: '15px', padding: '20px', backgroundColor: '#ffffff', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)' }}>
+      //         <p style={{ fontSize: '18px', color: '#001f3f', lineHeight: '1.6' }}>
+      //           This is the Case Report section. You can provide detailed summaries, analyses, or outcomes of the case here.
+      //           Ensure all important aspects are covered concisely and clearly.
+      //         </p>
 
-              <div
+      //         <div
+      //   style={{
+      //     marginTop: "20px",
+      //     border: "2px solid #d4af37",
+      //     borderRadius: "15px",
+      //     padding: "20px",
+      //     backgroundColor: "#ffffff",
+      //     boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+      //   }}
+      // >
+      //   {submittedText ? (
+      //     <p style={{ fontSize: "18px", color: "#001f3f", lineHeight: "1.6" }}>
+      //       {submittedText}
+      //     </p>
+      //   ) : (
+      //     <p style={{ fontSize: "18px", color: "#888888", lineHeight: "1.6" }}>
+      //       no result 
+      //     </p>
+      //   )}
+      // </div>
+
+      //       </div>
+      //     </div>
+      <div className="content-panel">
+      <h2>
+        <b>Case Report</b>
+      </h2>
+      <div
         style={{
-          marginTop: "20px",
           border: "2px solid #d4af37",
           borderRadius: "15px",
           padding: "20px",
@@ -338,19 +390,48 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
           boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {submittedText ? (
-          <p style={{ fontSize: "18px", color: "#001f3f", lineHeight: "1.6" }}>
-            {submittedText}
-          </p>
-        ) : (
-          <p style={{ fontSize: "18px", color: "#888888", lineHeight: "1.6" }}>
-            no result 
-          </p>
-        )}
-      </div>
+        <p
+          style={{
+            fontSize: "18px",
+            color: "#001f3f",
+            lineHeight: "1.6",
+          }}
+        >
+          This is the Case Report section. You can provide detailed summaries,
+          analyses, or outcomes of the case here. Ensure all important aspects
+          are covered concisely and clearly.
+        </p>
 
-            </div>
-          </div>
+        <div
+          style={{
+            marginTop: "20px",
+            border: "2px solid #d4af37",
+            borderRadius: "15px",
+            padding: "20px",
+            backgroundColor: "#ffffff",
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          {submittedText ? (
+            <ReactMarkdown
+              children={submittedText}
+              remarkPlugins={[remarkGfm]}
+              style={{ fontSize: "18px", color: "#001f3f", lineHeight: "1.6" }}
+            />
+          ) : (
+            <p
+              style={{
+                fontSize: "18px",
+                color: "#888888",
+                lineHeight: "1.6",
+              }}
+            >
+              No result
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
         )}
       </div>
  
