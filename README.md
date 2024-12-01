@@ -12,6 +12,9 @@ Court AI is designed to provide users with accessible and understandable legal a
 - **Legal Advice**: Get AI-powered advice on various legal matters.
 - **User-Friendly Interface**: Easy to navigate and use, even for those without legal expertise.
 
+## Architecture
+
+![alt text](ASSETS/architecture.png)
 
 ## License
 
@@ -19,4 +22,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-For any questions or inquiries, please contact us at johnfengphd.com
+For any questions or inquiries, please contact us at johnfengphd@gmail.com
