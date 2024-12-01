@@ -151,6 +151,11 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
     }
   };
 
+  const handleCase = (event) => {
+    setActiveTab('case-summary');
+    
+  }
+
   const handleText = (event) => {
     setCaseDetails(event.target.value); // Update state with the textarea value
   };
@@ -186,9 +191,10 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
       <div className="content">
         {/* Client Information Content */}
         {activeTab === 'client-info' && (
+          
           <div className="content-panel">
             <h2><b>Client Information</b></h2>
-            <form>
+            <form onSubmit={handleCase}>
               <div className="form-group">
                 <label htmlFor="legalName">Full Legal Name and Registration:</label>
                 <input type="text" id="legalName" name="legalName" placeholder="Enter your company's full legal name" />
@@ -209,8 +215,9 @@ GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.37
                 <textarea id="legalCounsel" name="legalCounsel" rows="3" placeholder="Have you engaged legal counsel? Provide their contact information."></textarea>
               </div>
 
-              <div className="form-group">
-                <button type="submit">Save Client Information</button>
+              <div  className="form-group">
+                <button     
+               type="submit">Save Client Information</button>
               </div>
             </form>
           </div>
