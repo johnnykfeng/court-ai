@@ -13,6 +13,8 @@ Court AI is designed to provide users with accessible and understandable legal a
 - **User-Friendly Interface**: Easy to navigate and use, even for those without legal expertise.
 
 ## Architecture
+Excalidraw link:
+https://excalidraw.com/#json=EDjSVorgtiOj_LbxooTGD,rWsntZQBkfJ-3M73KLeXmw
 
 ![alt text](ASSETS/architecture.png)
 
